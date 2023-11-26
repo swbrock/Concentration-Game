@@ -7,8 +7,7 @@
 
 import SwiftUI
 
-struct ConcentrationGameView: View {
-    
+struct ConcentrationGameView: View {    
     let emojiGame: EmojiConcentrationGame
     
     var body: some View {

@@ -84,4 +84,3 @@ struct CardView: View {
 #Preview {
     CardView(card: ConcentrationGame<String>.Card(isFaceUp: true, content: "🍔"))
         .padding(13)
-}
