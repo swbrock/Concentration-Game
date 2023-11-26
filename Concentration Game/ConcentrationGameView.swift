@@ -8,36 +8,58 @@
 import SwiftUI
 
 struct ConcentrationGameView: View {
-    var body: some View {
-        HStack {
-            ForEach(0..<4) { index in
-                CardView(isFaceUp: index > 1)
-            }
-        }        
-        .padding()
-
-    }
-}
-
-struct CardView: View {
-    var isFaceUp: Bool
     
+    let emojiGame: EmojiConcentrationGame
     
     var body: some View {
-        ZStack {
-            if isFaceUp {
-                RoundedRectangle(cornerRadius: 10).fill(.white)
-                RoundedRectangle(cornerRadius: 10).stroke()
-                Text("👨🏻‍🍼")
-                    .font(.largeTitle)
-            } else {
-                RoundedRectangle(cornerRadius: 10)
+        GeometryReader { geometry in
+            VStack {
+                LazyVGrid(columns: columns(for: geometry.size)) {
+                    ForEach(emojiGame.dealtCards) { card in
+                        CardView(card: card)
+                            .transition(AnyTransition.offset(randomOffscreenLocation))
+                            .onTapGesture {
+                                emojiGame.choose(card)
+                            }
+                    }
+                }
+                Spacer()
+                HStack {
+                    Button("New Game") {
+                        emojiGame.newGame()
+                    }
+                    Spacer()
+                    Text("Score: \(emojiGame.score)")
+                }
+                
             }
+            .padding()
+
         }
-        .foregroundStyle(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+        .onAppear {
+            emojiGame.dealCards()
+        }
+    }
+    
+    private var randomOffscreenLocation: CGSize {
+        let radius = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 1.5
+        let factor: Double = Int.random(in: 0...1) > 0 ? 1 : -1
+        return CGSize(width: factor * radius, height: factor * radius)
+    }
+    
+    //MARK - Drawing constant
+    
+    private struct Game {
+        static let desiredCardWidth = 125.0
+    }
+    
+    private func columns(for size: CGSize) -> [GridItem] {
+        Array(repeating: GridItem(.flexible()), count: Int(size.width / Game.desiredCardWidth))
     }
 }
+
+
 
 #Preview {
-    ConcentrationGameView()
+    ConcentrationGameView(emojiGame: EmojiConcentrationGame())
 }
